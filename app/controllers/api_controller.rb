@@ -3,8 +3,8 @@ class ApiController < ApplicationController
 
   private
   def authenticated?
-    authenticate_or_request_with_http_basic do |username, password|
-      user = User.find_by_email(username)
+    authenticate_or_request_with_http_basic do |email, password|
+      user = User.find_by_email(email)
       if user
         user.authenticate(password)
       else
