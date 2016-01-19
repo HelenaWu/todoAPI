@@ -11,10 +11,22 @@ class Api::ListsController < ApiController
     end
   end
 
+  def update
+    begin
+      list = find_list
+      if list.update(list_params)
+        render json: list
+      else
+        render json: {errors: list.errors.full_messages}, status: :unprocessible_entity
+      end
+    rescue ActiveRecord::RecordNotFound
+      render json: {errors: "list not found"}, status: :not_found          
+    end    
+  end
+
   def destroy
     begin
-      user = User.find(params[:user_id])
-      list = user.lists.find(params[:id])
+      list = find_list     
       list.destroy
       render json: {}, status: :no_content
 
@@ -25,5 +37,10 @@ class Api::ListsController < ApiController
   private
   def list_params
     params.require(:list).permit(:subject)
+  end
+
+  def find_list
+    user = User.find(params[:user_id])
+    user.lists.find(params[:id])
   end
 end
