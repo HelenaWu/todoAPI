@@ -1,13 +1,22 @@
 class Api::ListsController < ApiController
   before_action :authenticated?
 
+  def index
+    lists = List.all
+    render json: lists, each_serializer: ListSerializer
+  end
+
   def create
-    user = User.find(params[:user_id])    
-    list = user.lists.create(list_params)
-    if list.persisted?
-      render json: list
+    user = User.find(params[:user_id])  
+    if user == current_user  
+      list = user.lists.create(list_params)
+      if list.persisted?
+        render json: list
+      else
+        render json: {errors: list.errors.full_messages}, status: :unprocessible_entity
+      end
     else
-      render json: {errors: list.errors.full_messages}, status: :unprocessible_entity
+      render json: {errors: "Can't modify other users lists"}, status: :unprocessible_entity
     end
   end
 
@@ -40,7 +49,11 @@ class Api::ListsController < ApiController
   end
 
   def find_list
-    user = User.find(params[:user_id])
-    user.lists.find(params[:id])
+    user = User.find(params[:user_id])  
+    if user == current_user 
+      user.lists.find(params[:id]) 
+    else
+      raise ActiveRecord::RecordNotFound
+    end
   end
 end

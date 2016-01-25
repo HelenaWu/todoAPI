@@ -7,6 +7,7 @@ class ApiController < ApplicationController
       user = User.find_by_email(email)
       if user
         user.authenticate(password)
+        session[:user_id] = user.id
       else
         false
       end

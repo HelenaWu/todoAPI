@@ -4,12 +4,13 @@ Rails.application.routes.draw do
 
   namespace :api, defaults: {format: :json} do
     resources :users do
-      resources :lists
+      resources :lists, except: :index
     end
     resources :lists, only: [] do
-      resources :items, only: [:create]
+      resources :items, only: [:create, :update]
     end
-    resources :items, only: [:update]
+    resources :lists, only: :index
+    resources :items, only: :index
   end
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
